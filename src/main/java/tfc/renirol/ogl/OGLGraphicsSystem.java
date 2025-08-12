@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import tfc.renirol.api.enums.DrawMode;
+import tfc.renirol.api.enums.NumericPrimitive;
 import tfc.renirol.api.framebuffer.FrameBuffer;
 import tfc.renirol.api.shader.ShaderProgram;
 import tfc.renirol.api.state.RenderPass;
@@ -35,6 +36,26 @@ public class OGLGraphicsSystem extends OGLObjectManager {
     @Override
     public void drawArrays(int firstVert, int numVerts) {
         GL20.glDrawArrays(drawMode, firstVert, numVerts);
+    }
+
+    @Override
+    public void drawElements(int numVerts, NumericPrimitive indexType) {
+        GL20.glDrawElements(drawMode, numVerts, switch (indexType) {
+            case SHORT, USHORT -> GL30.GL_UNSIGNED_SHORT;
+            case INT, UINT -> GL30.GL_UNSIGNED_INT;
+            case BYTE, UBYTE -> GL30.GL_UNSIGNED_BYTE;
+            default -> throw new RuntimeException("Unsupported index type");
+        }, 0);
+    }
+
+    @Override
+    public void drawElements(int firstVert, int numVerts, NumericPrimitive indexType) {
+        GL20.glDrawRangeElements(drawMode, firstVert, firstVert + numVerts, numVerts, switch (indexType) {
+            case SHORT, USHORT -> GL30.GL_UNSIGNED_SHORT;
+            case INT, UINT -> GL30.GL_UNSIGNED_INT;
+            case BYTE, UBYTE -> GL30.GL_UNSIGNED_BYTE;
+            default -> throw new RuntimeException("Unsupported index type");
+        }, 0);
     }
 
     @Override

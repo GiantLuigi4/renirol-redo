@@ -7,6 +7,7 @@ version = '1.0-SNAPSHOT'
 
 project.ext.lwjglVersion = "3.4.0-SNAPSHOT"
 project.ext.jomlVersion = "1.10.8"
+project.ext.joml_primitivesVersion = "1.10.0"
 project.ext.lwjglNatives = "natives-windows"
 
 repositories {
@@ -27,6 +28,8 @@ dependencies {
     implementation "org.lwjgl:lwjgl-glfw::$lwjglNatives"
     implementation "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 //    implementation "org.joml:joml:${jomlVersion}"
+    implementation "org.joml:joml:${jomlVersion}"
+    implementation "org.joml:joml-primitives:${joml_primitivesVersion}"
 }
 
 test {

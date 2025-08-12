@@ -1,6 +1,7 @@
 package tfc.renirol.api.obj;
 
 import tfc.renirol.api.Resource;
+import tfc.renirol.api.enums.NumericPrimitive;
 
 public abstract class ArrayObject extends Resource<ArrayObject> {
     public abstract void activate();

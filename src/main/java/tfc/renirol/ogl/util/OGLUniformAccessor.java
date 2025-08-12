@@ -105,43 +105,43 @@ public class OGLUniformAccessor extends UniformAccessor {
                             GL30.glUniformMatrix2fv(location, transposed, ib);
                         };
                     }
-                }
-
-                switch (width) {
-                    case 2 -> {
-                        switch (height) {
-                            case 4 -> upload = () -> {
-                                ensureBind();
-                                GL30.glUniformMatrix2x4fv(location, transposed, ib);
-                            };
-                            case 3 -> upload = () -> {
-                                ensureBind();
-                                GL30.glUniformMatrix2x3fv(location, transposed, ib);
-                            };
+                } else {
+                    switch (width) {
+                        case 2 -> {
+                            switch (height) {
+                                case 4 -> upload = () -> {
+                                    ensureBind();
+                                    GL30.glUniformMatrix2x4fv(location, transposed, ib);
+                                };
+                                case 3 -> upload = () -> {
+                                    ensureBind();
+                                    GL30.glUniformMatrix2x3fv(location, transposed, ib);
+                                };
+                            }
                         }
-                    }
-                    case 3 -> {
-                        switch (height) {
-                            case 4 -> upload = () -> {
-                                ensureBind();
-                                GL30.glUniformMatrix3x4fv(location, transposed, ib);
-                            };
-                            case 2 -> upload = () -> {
-                                ensureBind();
-                                GL30.glUniformMatrix3x2fv(location, transposed, ib);
-                            };
+                        case 3 -> {
+                            switch (height) {
+                                case 4 -> upload = () -> {
+                                    ensureBind();
+                                    GL30.glUniformMatrix3x4fv(location, transposed, ib);
+                                };
+                                case 2 -> upload = () -> {
+                                    ensureBind();
+                                    GL30.glUniformMatrix3x2fv(location, transposed, ib);
+                                };
+                            }
                         }
-                    }
-                    case 4 -> {
-                        switch (height) {
-                            case 4 -> upload = () -> {
-                                ensureBind();
-                                GL30.glUniformMatrix4x3fv(location, transposed, ib);
-                            };
-                            case 2 -> upload = () -> {
-                                ensureBind();
-                                GL30.glUniformMatrix4x2fv(location, transposed, ib);
-                            };
+                        case 4 -> {
+                            switch (height) {
+                                case 4 -> upload = () -> {
+                                    ensureBind();
+                                    GL30.glUniformMatrix4x3fv(location, transposed, ib);
+                                };
+                                case 2 -> upload = () -> {
+                                    ensureBind();
+                                    GL30.glUniformMatrix4x2fv(location, transposed, ib);
+                                };
+                            }
                         }
                     }
                 }
@@ -193,10 +193,12 @@ public class OGLUniformAccessor extends UniformAccessor {
     }
 
     public UniformAccessor setInts(IntBuffer data) {
+        int start = data.position();
         IntBuffer ints = this.data.asIntBuffer();
         ints.put(data);
         ints.position(0);
         dirty = true;
+        data.position(start);
         return this;
     }
 
@@ -244,10 +246,13 @@ public class OGLUniformAccessor extends UniformAccessor {
     }
 
     public UniformAccessor setFloats(FloatBuffer data) {
+        int start = data.position();
         FloatBuffer ints = this.data.asFloatBuffer();
         ints.put(data);
+        MemoryUtil.memCopy(data, ints);
         ints.position(0);
         dirty = true;
+        data.position(start);
         return this;
     }
 

@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.KHRDebug;
 import tfc.renirol.api.enums.AdvanceRate;
+import tfc.renirol.api.enums.NumericPrimitive;
 import tfc.renirol.api.obj.ArrayObject;
 import tfc.renirol.api.obj.GPUBuffer;
 import tfc.renirol.api.obj.VertexAttribute;
