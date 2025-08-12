@@ -1,11 +1,11 @@
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryUtil;
 import tfc.renirol.api.ReniContext;
 import tfc.renirol.api.ReniWindow;
+import tfc.renirol.api.cmd.CommandBuffer;
 import tfc.renirol.api.enums.*;
 import tfc.renirol.api.framebuffer.FrameBuffer;
 import tfc.renirol.api.obj.ArrayObject;
@@ -26,6 +26,7 @@ public class Cube {
         ReniContext context = ReniContext.create(
                 "glfw", "opengl"
         );
+        context.allowLegacyOptimizations();
 
         ReniWindow mainWindow = context.makeWindow(
                 "Title", 200, 200
@@ -36,15 +37,15 @@ public class Cube {
         context.graphicsSystem.start();
 
 
-        System.out.println(GL30.glGetString(GL30.GL_VENDOR));
-        System.out.println(GL30.glGetString(GL30.GL_RENDER));
-        System.out.println(GL30.glGetString(GL30.GL_VERSION));
-        System.out.println(GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION));
-
-        int numExt = GL30.glGetInteger(GL30.GL_NUM_EXTENSIONS);
-        for (int i = 0; i < numExt; i++) {
-            System.out.println(GL30.glGetStringi(GL30.GL_EXTENSIONS, i));
-        }
+//        System.out.println(GL30.glGetString(GL30.GL_VENDOR));
+//        System.out.println(GL30.glGetString(GL30.GL_RENDER));
+//        System.out.println(GL30.glGetString(GL30.GL_VERSION));
+//        System.out.println(GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION));
+//
+//        int numExt = GL30.glGetInteger(GL30.GL_NUM_EXTENSIONS);
+//        for (int i = 0; i < numExt; i++) {
+//            System.out.println(GL30.glGetStringi(GL30.GL_EXTENSIONS, i));
+//        }
 
 
         GLUtil.setupDebugMessageCallback(System.err);
@@ -223,6 +224,16 @@ public class Cube {
 
         FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(16);
 
+        CommandBuffer drawCube = context.graphicsSystem.commandBuffer();
+        {
+            drawCube.setDrawMode(DrawMode.TRIANGLES);
+            drawCube.bindVAO(ao);
+            drawCube.drawElements(36, NumericPrimitive.SHORT);
+            drawCube.clearShader();
+            drawCube.unbindVAO();
+        }
+        drawCube.compile();
+
         while (!mainWindow.shouldClose()) {
             mainWindow.pollEvents();
 
@@ -249,15 +260,12 @@ public class Cube {
 
             fbo.bindWrite();
 
-            ao.activate();
             context.graphicsSystem.useShader(program);
             projection.get(matrixBuffer);
             matrProjAccess.setFloats(matrixBuffer).upload();
             view.get(matrixBuffer);
             matrModelAccess.setFloats(matrixBuffer).upload();
-            context.graphicsSystem.drawElements(36, NumericPrimitive.SHORT);
-            context.graphicsSystem.clearShader();
-            ao.deactivate();
+            drawCube.dispatch();
 
             fbo.unbindWrite();
 

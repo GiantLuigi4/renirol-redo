@@ -7,9 +7,15 @@ import tfc.renirol.internal.WindowSystem;
 
 public class GlfwWindowSystem extends WindowSystem {
     public static final WindowSystem INSTANCE = new GlfwWindowSystem();
+    protected boolean useLegacyOpt = false;
 
     static {
         GLFW.glfwInit();
+    }
+
+    @Override
+    public void legacyOpt(boolean legacyOpt) {
+        useLegacyOpt = legacyOpt;
     }
 
     @Override
@@ -30,9 +36,14 @@ public class GlfwWindowSystem extends WindowSystem {
 
     public void setupHints() {
         // TODO
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+        if (useLegacyOpt) {
+            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_COMPAT_PROFILE);
+        } else {
+            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+        }
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE); // Essential!
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
+//        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_NO_ERROR, GLFW.GLFW_NO_ERROR);
     }
 }

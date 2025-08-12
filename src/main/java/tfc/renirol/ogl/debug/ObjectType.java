@@ -6,5 +6,6 @@ public enum ObjectType {
     GPU_BUFFER,
     ARRAY_BUFFER,
     SHADER_PROGRAM,
-    SHADER_OBJECT
+    SHADER_OBJECT,
+    GL_DISPLAY_LIST
 }

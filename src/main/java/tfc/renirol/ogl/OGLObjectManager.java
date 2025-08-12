@@ -1,9 +1,9 @@
 package tfc.renirol.ogl;
 
-import org.lwjgl.opengl.EXTDebugMarker;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.KHRDebug;
+import tfc.renirol.api.cmd.CommandBuffer;
 import tfc.renirol.api.enums.ShaderType;
 import tfc.renirol.api.enums.TextureFormat;
 import tfc.renirol.api.framebuffer.FrameBuffer;
@@ -14,38 +14,47 @@ import tfc.renirol.api.shader.ShaderProgram;
 import tfc.renirol.api.textures.Texture2D;
 import tfc.renirol.api.textures.TextureBuilder;
 import tfc.renirol.internal.GraphicsSystem;
+import tfc.renirol.ogl.cmd.DisplayListCmdBuffer;
+import tfc.renirol.ogl.cmd.GLCmdBuffer;
 import tfc.renirol.ogl.debug.*;
 import tfc.renirol.ogl.obj.*;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 abstract class OGLObjectManager extends GraphicsSystem {
     public OGLObjectManager() {
     }
 
     public DebugMechanism debug = new NoDebugMechanism();
+    boolean supportsDisplayLists = false;
 
     @Override
     public void start() {
         int numExt = GL30.glGetInteger(GL30.GL_NUM_EXTENSIONS);
-        boolean khr_debug = false;
-        boolean ext_label = false;
-        boolean ext_marker = false;
-        for (int i = 0; i < numExt; i++) {
-            String ext = GL30.glGetStringi(GL30.GL_EXTENSIONS, i);
-            if (ext.equals("GL_KHR_debug")) {
-                khr_debug = true;
-                debug = new KHRMechanism();
-                break;
-            } else if (ext.equals("GL_EXT_debug_label")) {
-                ext_label = true;
+        boolean khr_debug = GL.getCapabilities().GL_KHR_debug;
+        boolean ext_label = GL.getCapabilities().GL_EXT_debug_label;
+        boolean ext_marker = GL.getCapabilities().GL_EXT_debug_marker;
+        if (!khr_debug) {
+            for (int i = 0; i < numExt; i++) {
+                String ext = GL30.glGetStringi(GL30.GL_EXTENSIONS, i);
+                if (ext.equals("GL_KHR_debug")) {
+                    khr_debug = true;
+                    debug = new KHRMechanism();
+                    break;
+                } else if (ext.equals("GL_EXT_debug_label")) {
+                    ext_label = true;
+                }
+                // TODO: can I... detect the ext debug mechanisms this way..?
             }
-            // TODO: ext debug mechanism
+
+            if (!khr_debug)
+                debug = new EXTMechanism(
+                        ext_label || GL.getCapabilities().glLabelObjectEXT != 0,
+                        ext_marker || GL.getCapabilities().glPushGroupMarkerEXT != 0
+                );
+        } else {
+            debug = new KHRMechanism();
         }
 
-        if (!khr_debug)
-            debug = new EXTMechanism(true, true);
+        supportsDisplayLists = GL.getCapabilities().glCallLists != 0;
     }
 
     @Override
@@ -167,5 +176,14 @@ abstract class OGLObjectManager extends GraphicsSystem {
 
     public void setDebugName(ObjectType type, int id, String name) {
         debug.setDebugName(type, id, name);
+    }
+
+    @Override
+    public CommandBuffer commandBuffer() {
+        if (supportsDisplayLists) {
+            return new DisplayListCmdBuffer((OGLGraphicsSystem) this);
+        } else {
+            return new GLCmdBuffer((OGLGraphicsSystem) this);
+        }
     }
 }

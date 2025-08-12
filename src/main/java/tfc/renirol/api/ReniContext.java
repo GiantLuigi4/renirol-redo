@@ -9,6 +9,7 @@ public class ReniContext {
     public final WindowSystem windowSystem;
     public final GraphicsSystem graphicsSystem;
     public final String graphicsApi;
+    protected boolean legacyOpt = false;
 
     public ReniContext(WindowSystem windowSystem, GraphicsSystem graphicsSystem, String graphicsApi) {
         this.windowSystem = windowSystem;
@@ -37,6 +38,7 @@ public class ReniContext {
     }
 
     public ReniWindow makeWindow(String title, int width, int height) {
+        windowSystem.legacyOpt(legacyOpt);
         ReniWindow window = windowSystem.createWindow(title, width, height);
         windowSystem.installAPI(window, graphicsApi);
         return window;
@@ -44,5 +46,13 @@ public class ReniContext {
 
     public void close() {
         graphicsSystem.close();
+    }
+
+    /**
+     * Allows optimizations that are only available in legacy contexts of the chosen graphics api
+     * Notable example: OpenGL display lists
+     */
+    public void allowLegacyOptimizations() {
+        legacyOpt = true;
     }
 }

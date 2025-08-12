@@ -13,6 +13,7 @@ public class KHRMechanism extends DebugMechanism {
             case SHADER_OBJECT -> KHRDebug.GL_SHADER;
             case SHADER_PROGRAM -> KHRDebug.GL_PROGRAM;
             case GPU_BUFFER -> KHRDebug.GL_BUFFER;
+            case GL_DISPLAY_LIST -> KHRDebug.GL_DISPLAY_LIST;
         }, id, name);
     }
 }

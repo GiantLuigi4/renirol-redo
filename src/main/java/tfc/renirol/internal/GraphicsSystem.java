@@ -2,6 +2,7 @@ package tfc.renirol.internal;
 
 import tfc.renirol.api.GraphicsCalls;
 import tfc.renirol.api.Resource;
+import tfc.renirol.api.cmd.CommandBuffer;
 import tfc.renirol.api.enums.ShaderType;
 import tfc.renirol.api.enums.TextureFormat;
 import tfc.renirol.api.framebuffer.FrameBuffer;
@@ -18,7 +19,7 @@ import java.util.List;
 /**
  * All objects have an auto-binding contract when operations which require binding are called
  */
-public abstract class GraphicsSystem extends GraphicsCalls {
+public abstract class GraphicsSystem implements GraphicsCalls {
     List<Resource> resources = new ArrayList<>();
 
     public abstract void start();
@@ -36,6 +37,8 @@ public abstract class GraphicsSystem extends GraphicsCalls {
     public abstract ShaderObject shader(ShaderType type);
 
     public abstract ShaderProgram shaderProgram();
+
+    public abstract CommandBuffer commandBuffer() ;
 
     /**
      * Unbinds any active framebuffer and prepares the given framebuffer's contents for presentation (display)
