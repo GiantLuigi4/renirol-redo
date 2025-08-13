@@ -18,7 +18,6 @@ public class GLCmdBuffer extends CommandBuffer {
     protected List<Consumer<GraphicsCalls>> commands = new ArrayList<>();
     protected OGLGraphicsSystem system;
     protected boolean compiled = false;
-    protected boolean drawModeSet = false;
     protected ArrayObject finalObj;
 
     public GLCmdBuffer(OGLGraphicsSystem system) {
@@ -56,15 +55,11 @@ public class GLCmdBuffer extends CommandBuffer {
         commands.add((calls) -> {
             calls.setDrawMode(mode);
         });
-        drawModeSet = true;
     }
 
     @Override
     public void drawArrays(int firstVert, int numVerts) {
         validateUncompiled();
-        if (!drawModeSet) {
-            throw new RuntimeException("Must set a draw mode before making a render call.");
-        }
         commands.add((calls) -> {
             calls.drawArrays(firstVert, numVerts);
         });
@@ -73,9 +68,6 @@ public class GLCmdBuffer extends CommandBuffer {
     @Override
     public void drawElements(int firstVert, int numVerts, NumericPrimitive indexType) {
         validateUncompiled();
-        if (!drawModeSet) {
-            throw new RuntimeException("Must set a draw mode before making a render call.");
-        }
         commands.add((calls) -> {
             calls.drawElements(firstVert, numVerts, indexType);
         });
@@ -84,9 +76,6 @@ public class GLCmdBuffer extends CommandBuffer {
     @Override
     public void drawArraysInstanced(int firstVert, int numVerts, int instances) {
         validateUncompiled();
-        if (!drawModeSet) {
-            throw new RuntimeException("Must set a draw mode before making a render call.");
-        }
         commands.add((calls) -> {
             calls.drawArraysInstanced(firstVert, numVerts, instances);
         });
@@ -95,9 +84,6 @@ public class GLCmdBuffer extends CommandBuffer {
     @Override
     public void drawElementsInstanced(int firstVert, int numVerts, int instances, NumericPrimitive indexType) {
         validateUncompiled();
-        if (!drawModeSet) {
-            throw new RuntimeException("Must set a draw mode before making a render call.");
-        }
         commands.add((calls) -> {
             calls.drawElementsInstanced(firstVert, numVerts, instances, indexType);
         });
