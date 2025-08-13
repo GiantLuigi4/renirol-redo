@@ -8,7 +8,6 @@ import tfc.renirol.api.enums.NumericPrimitive;
 import tfc.renirol.api.framebuffer.FrameBuffer;
 import tfc.renirol.api.shader.ShaderProgram;
 import tfc.renirol.api.state.RenderPass;
-import tfc.renirol.ogl.obj.OGLArrayObject;
 import tfc.renirol.ogl.obj.OGLFBO;
 import tfc.renirol.ogl.obj.OGLShaderProgram;
 
@@ -56,6 +55,31 @@ public class OGLGraphicsSystem extends OGLObjectManager {
             case BYTE, UBYTE -> GL30.GL_UNSIGNED_BYTE;
             default -> throw new RuntimeException("Unsupported index type");
         }, 0);
+    }
+
+    @Override
+    public void drawArraysInstanced(int firstVert, int numVerts, int instances) {
+        GL33.glDrawArraysInstanced(drawMode, firstVert, instances, numVerts);
+    }
+
+    @Override
+    public void drawElementsInstanced(int numVerts, int instances, NumericPrimitive indexType) {
+        GL33.glDrawElementsInstanced(drawMode, numVerts, switch (indexType) {
+            case SHORT, USHORT -> GL30.GL_UNSIGNED_SHORT;
+            case INT, UINT -> GL30.GL_UNSIGNED_INT;
+            case BYTE, UBYTE -> GL30.GL_UNSIGNED_BYTE;
+            default -> throw new RuntimeException("Unsupported index type");
+        }, 0, instances);
+    }
+
+    @Override
+    public void drawElementsInstanced(int firstVert, int numVerts, int instances, NumericPrimitive indexType) {
+        GL33.glDrawElementsInstancedBaseVertex(drawMode, numVerts, switch (indexType) {
+            case SHORT, USHORT -> GL30.GL_UNSIGNED_SHORT;
+            case INT, UINT -> GL30.GL_UNSIGNED_INT;
+            case BYTE, UBYTE -> GL30.GL_UNSIGNED_BYTE;
+            default -> throw new RuntimeException("Unsupported index type");
+        }, 0, instances, firstVert);
     }
 
     @Override

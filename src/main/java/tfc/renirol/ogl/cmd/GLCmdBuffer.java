@@ -19,6 +19,7 @@ public class GLCmdBuffer extends CommandBuffer {
     protected OGLGraphicsSystem system;
     protected boolean compiled = false;
     protected boolean drawModeSet = false;
+    protected ArrayObject finalObj;
 
     public GLCmdBuffer(OGLGraphicsSystem system) {
         this.system = system;
@@ -38,6 +39,7 @@ public class GLCmdBuffer extends CommandBuffer {
         commands.add((calls) -> {
             system.bindVAO((OGLArrayObject) obj);
         });
+        finalObj = obj;
     }
 
     @Override
@@ -76,6 +78,28 @@ public class GLCmdBuffer extends CommandBuffer {
         }
         commands.add((calls) -> {
             calls.drawElements(firstVert, numVerts, indexType);
+        });
+    }
+
+    @Override
+    public void drawArraysInstanced(int firstVert, int numVerts, int instances) {
+        validateUncompiled();
+        if (!drawModeSet) {
+            throw new RuntimeException("Must set a draw mode before making a render call.");
+        }
+        commands.add((calls) -> {
+            calls.drawArraysInstanced(firstVert, numVerts, instances);
+        });
+    }
+
+    @Override
+    public void drawElementsInstanced(int firstVert, int numVerts, int instances, NumericPrimitive indexType) {
+        validateUncompiled();
+        if (!drawModeSet) {
+            throw new RuntimeException("Must set a draw mode before making a render call.");
+        }
+        commands.add((calls) -> {
+            calls.drawElementsInstanced(firstVert, numVerts, instances, indexType);
         });
     }
 

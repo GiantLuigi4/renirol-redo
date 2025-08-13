@@ -18,7 +18,7 @@ import tfc.renirol.api.shader.UniformAccessor;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-public class Cube {
+public class Cubes {
     public static void main(String[] args) {
         Configuration.DEBUG.set(true);
         Configuration.DEBUG_LOADER.set(true);
@@ -178,7 +178,8 @@ public class Cube {
                         uniform mat4 proj;
                         uniform mat4 model;
                         void main() {
-                            gl_Position = proj * model * vec4(pos, 1.0);
+                            vec3 _pos = pos + vec3((gl_InstanceID - 1) * 4, 0, 0);
+                            gl_Position = proj * model * vec4(_pos, 1.0);
                             color = (pos + 1) / 2;
                             color.b = 1 - max(color.r, color.g);
                         }
@@ -228,7 +229,8 @@ public class Cube {
         {
             drawCube.setDrawMode(DrawMode.TRIANGLES);
             drawCube.bindVAO(ao);
-            drawCube.drawElements(36, NumericPrimitive.SHORT);
+            drawCube.drawArrays(0, 3);
+            drawCube.drawElementsInstanced(36, 3, NumericPrimitive.SHORT);
             drawCube.clearShader();
             drawCube.unbindVAO();
         }
@@ -266,6 +268,13 @@ public class Cube {
             view.get(matrixBuffer);
             matrModelAccess.setFloats(matrixBuffer).upload();
             drawCube.dispatch();
+
+//            context.graphicsSystem.useShader(program);
+//            context.graphicsSystem.setDrawMode(DrawMode.TRIANGLES);
+//            ao.activate();
+//            context.graphicsSystem.drawElements(36, NumericPrimitive.SHORT);
+//            context.graphicsSystem.drawElementsInstanced(36, 3, NumericPrimitive.SHORT);
+//            ao.deactivate();
 
             fbo.unbindWrite();
 

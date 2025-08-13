@@ -22,6 +22,18 @@ public interface GraphicsCalls {
 
     void drawElements(int firstVert, int numVerts, NumericPrimitive indexType);
 
+    default void drawArraysInstanced(int numVerts, int instances) {
+        drawArraysInstanced(0,  numVerts, instances);
+    }
+
+    void drawArraysInstanced(int firstVert, int numVerts, int instances);
+
+    default void drawElementsInstanced(int numVerts, int instances, NumericPrimitive indexType) {
+        drawElementsInstanced(0,  numVerts, instances, indexType);
+    }
+
+    void drawElementsInstanced(int firstVert, int numVerts, int instances, NumericPrimitive indexType);
+
     void setViewport(int x, int y, int width, int height);
 
     void useShader(ShaderProgram program);

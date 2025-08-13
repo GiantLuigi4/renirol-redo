@@ -181,9 +181,9 @@ abstract class OGLObjectManager extends GraphicsSystem {
     @Override
     public CommandBuffer commandBuffer() {
         if (supportsDisplayLists) {
-            return new DisplayListCmdBuffer((OGLGraphicsSystem) this);
+            return bindObject(new DisplayListCmdBuffer((OGLGraphicsSystem) this));
         } else {
-            return new GLCmdBuffer((OGLGraphicsSystem) this);
+            return bindObject(new GLCmdBuffer((OGLGraphicsSystem) this));
         }
     }
 }
