@@ -16,45 +16,22 @@ public class DisplayListCmdBuffer extends GLCmdBuffer {
     List<Section> lists = new ArrayList<>();
     boolean clearsShader = false;
     boolean unbindsArray = false;
-    // it appears that compiling a display list with no draw calls is undefined behavior?
-    boolean containsDrawCall = false;
+    boolean currentlyCompilable = false;
 
     public DisplayListCmdBuffer(OGLGraphicsSystem system) {
         super(system);
     }
 
     @Override
-    public void drawArrays(int firstVert, int numVerts) {
-        super.drawArrays(firstVert, numVerts);
-        containsDrawCall = true;
-    }
-
-    @Override
-    public void drawElements(int firstVert, int numVerts, NumericPrimitive indexType) {
-        super.drawElements(firstVert, numVerts, indexType);
-        containsDrawCall = true;
-    }
-
-    @Override
     public void drawArraysInstanced(int numVerts, int instances) {
-        if (!commands.isEmpty()) lists.add(new Section(commands, containsDrawCall, finalObj));
-        finalObj = null;
-        commands = new ArrayList<>();
         super.drawArraysInstanced(numVerts, instances);
-        lists.add(new Section(commands, false, finalObj));
-        commands = new ArrayList<>();
-        containsDrawCall = false;
+        currentlyCompilable = false;
     }
 
     @Override
     public void drawElementsInstanced(int numVerts, int instances, NumericPrimitive indexType) {
-        if (!commands.isEmpty()) lists.add(new Section(commands, containsDrawCall, finalObj));
-        finalObj = null;
-        commands = new ArrayList<>();
         super.drawElementsInstanced(numVerts, instances, indexType);
-        lists.add(new Section(commands, false, finalObj));
-        commands = new ArrayList<>();
-        containsDrawCall = false;
+        currentlyCompilable = false;
     }
 
     @Override
@@ -70,10 +47,16 @@ public class DisplayListCmdBuffer extends GLCmdBuffer {
     }
 
     @Override
-    public void compile() {
-        if (!commands.isEmpty()) lists.add(new Section(commands, containsDrawCall, finalObj));
+    public void segment() {
+        if (!commands.isEmpty()) lists.add(new Section(commands, currentlyCompilable, finalObj));
         finalObj = null;
-        containsDrawCall = false;
+        currentlyCompilable = true;
+    }
+
+    @Override
+    public void compile() {
+        if (!commands.isEmpty()) lists.add(new Section(commands, currentlyCompilable, finalObj));
+        finalObj = null;
 
         int count = lists.size();
         for (int i = 0; i < count - 1; i++) {

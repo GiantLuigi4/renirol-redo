@@ -22,4 +22,10 @@ public abstract class CommandBuffer extends Resource<CommandBuffer> implements G
      * Invokes the command buffer, causing its effect to be performed
      */
     public abstract void dispatch();
+
+    /**
+     * Introduces a sort of graph break
+     * This may or may not have overhead depending on backend and configuration
+     */
+    public abstract void segment();
 }

@@ -229,7 +229,6 @@ public class Cubes {
         {
             drawCube.setDrawMode(DrawMode.TRIANGLES);
             drawCube.bindVAO(ao);
-            drawCube.drawArrays(0, 3);
             drawCube.drawElementsInstanced(36, 3, NumericPrimitive.SHORT);
             drawCube.clearShader();
             drawCube.unbindVAO();
