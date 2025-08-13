@@ -26,6 +26,9 @@ public abstract class CommandBuffer extends Resource<CommandBuffer> implements G
     /**
      * Introduces a sort of graph break
      * This may or may not have overhead depending on backend and configuration
+     * It also may or may not allow for more intent-aware internal optimizations, or be required in order for some configurations to work
+     * Backends should attempt to optimize out any necessary segmenting
      */
-    public abstract void segment();
+    public void segment() {
+    }
 }

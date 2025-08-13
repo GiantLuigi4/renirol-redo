@@ -14,7 +14,6 @@ import tfc.renirol.api.shader.ShaderProgram;
 import tfc.renirol.api.textures.Texture2D;
 import tfc.renirol.api.textures.TextureBuilder;
 import tfc.renirol.internal.GraphicsSystem;
-import tfc.renirol.ogl.cmd.DisplayListCmdBuffer;
 import tfc.renirol.ogl.cmd.GLCmdBuffer;
 import tfc.renirol.ogl.debug.*;
 import tfc.renirol.ogl.obj.*;
@@ -181,7 +180,8 @@ abstract class OGLObjectManager extends GraphicsSystem {
     @Override
     public CommandBuffer commandBuffer() {
         if (supportsDisplayLists) {
-            return bindObject(new DisplayListCmdBuffer((OGLGraphicsSystem) this));
+//            return bindObject(new DisplayListCmdBuffer((OGLGraphicsSystem) this));
+            return bindObject(new GLCmdBuffer((OGLGraphicsSystem) this));
         } else {
             return bindObject(new GLCmdBuffer((OGLGraphicsSystem) this));
         }
