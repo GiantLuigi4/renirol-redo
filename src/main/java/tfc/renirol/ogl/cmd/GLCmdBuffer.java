@@ -137,19 +137,24 @@ public class GLCmdBuffer extends CommandBuffer {
     }
 
     @Override
-    public void debugEvent(String testEvent, int color) {
+    public void debugEvent(String text, int color) {
         validateUncompiled();
-        commands.add(new CallArgs.Obj1(DrawCommands.DEBUG_EVT, testEvent));
+        if (system.debug.supportsMarkers())
+            commands.add(new CallArgs.Obj1(DrawCommands.DEBUG_EVT, text));
     }
 
     @Override
-    public void debugGroup(String testEvent, int color) {
-
+    public void debugGroup(String name, int color) {
+        validateUncompiled();
+        if (system.debug.supportsGroups())
+            commands.add(new CallArgs.Obj1(DrawCommands.DEBUG_GROUP, name));
     }
 
     @Override
     public void exitGroup() {
-
+        validateUncompiled();
+        if (system.debug.supportsGroups())
+            commands.add(new CallArgs.NoArg(DrawCommands.END_GROUP));
     }
 
     @Override
@@ -267,6 +272,16 @@ public class GLCmdBuffer extends CommandBuffer {
                 case VIEWPORT -> {
                     CallArgs.Int4 int4 = ((CallArgs.Int4) command);
                     system.setViewport(int4.arg0, int4.arg1, int4.arg2, int4.arg3);
+                }
+
+                case DEBUG_EVT -> {
+                    system.debugEvent((String) (((CallArgs.Obj1) command).arg0), 0);
+                }
+                case DEBUG_GROUP -> {
+                    system.debugGroup((String) (((CallArgs.Obj1) command).arg0), 0);
+                }
+                case END_GROUP -> {
+                    system.exitGroup();
                 }
             }
         }

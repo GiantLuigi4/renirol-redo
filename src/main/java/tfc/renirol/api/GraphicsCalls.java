@@ -44,9 +44,9 @@ public interface GraphicsCalls {
 
     void clearShader();
 
-    void debugEvent(String testEvent, int color);
+    void debugEvent(String text, int color);
 
-    void debugGroup(String testEvent, int color);
+    void debugGroup(String name, int color);
 
     void exitGroup();
 }

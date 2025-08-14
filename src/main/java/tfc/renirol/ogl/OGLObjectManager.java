@@ -254,13 +254,13 @@ abstract class OGLObjectManager extends GraphicsSystem {
     }
 
     @Override
-    public void debugEvent(String testEvent, int color) {
-        debug.debugEvent(testEvent, color);
+    public void debugEvent(String text, int color) {
+        debug.debugEvent(text, color);
     }
 
     @Override
-    public void debugGroup(String testEvent, int color) {
-        debug.debugSection(testEvent, color);
+    public void debugGroup(String name, int color) {
+        debug.debugSection(name, color);
     }
 
     @Override

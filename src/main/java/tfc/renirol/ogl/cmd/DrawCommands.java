@@ -34,7 +34,10 @@ public enum DrawCommands {
     DRAW_ARRAYS_INSTANCED(false, true, true),
     // 4 ints
     DRAW_ELEMENTS_INSTANCED(false, true, true),
-    DEBUG_EVT(false, true, true);
+    DEBUG_EVT(false, true, true),
+    DEBUG_GROUP(false, true, true),
+    END_GROUP(false, true, true),
+    ;
 
     // indicates that basic deduplication is viable for this operation
     // basic deduplication meaning that, if an operation occurs multiple times between two draw calls, only the last one is meaningful

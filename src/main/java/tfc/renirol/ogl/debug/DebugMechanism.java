@@ -8,4 +8,8 @@ public abstract class DebugMechanism {
     public abstract void exitSection();
 
     public abstract void debugEvent(String name, int color);
+
+    public abstract boolean supportsMarkers();
+
+    public abstract boolean supportsGroups();
 }
