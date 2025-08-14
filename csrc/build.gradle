@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// TODO: adapt for other operating systems
+tasks.register('native_build') {
+    def sourceFiles = fileTree(dir: 'src/main/cpp/', include: ['**/*.cpp']).files.collect { it.absolutePath.replace('\\', '/')  }
+//    def sourceFiles = fileTree(dir: 'src/main/cpp/', include: ['**/*.cpp', '**/*.hpp', '**/*.h']).files.collect { it.absolutePath.replace('\\', '/')  }
+    def rspFile = file("${buildDir}/sources.txt")
+    rspFile.parentFile.mkdirs()
+    rspFile.text = sourceFiles.join('\n')
+
+    String home = file(System.getProperty("java.home")).absolutePath
+
+    doLast {
+        exec {
+            commandLine 'clang',
+                    '-shared',
+                    "-I${home}/include",
+                    "-I${home}/include/win32",
+                    "-lopengl32",
+                    "-lglfw3",
+                    "@${rspFile.absolutePath}", '-o', 'renirol.dll'
+        }
+
+        println "Built my_program.exe with ${sourceFiles.size()} source files"
+    }
+
+//    doLast {
+//        Runtime rt = Runtime.getRuntime();
+//        rt.exec("clang *.cpp */*.cpp */*/*.cpp -o my_program.exe")
+//    }
+}
