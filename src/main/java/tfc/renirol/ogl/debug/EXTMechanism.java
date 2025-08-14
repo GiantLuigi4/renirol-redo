@@ -1,6 +1,7 @@
 package tfc.renirol.ogl.debug;
 
 import org.lwjgl.opengl.EXTDebugLabel;
+import org.lwjgl.opengl.EXTDebugMarker;
 import org.lwjgl.opengl.GL30;
 
 public class EXTMechanism extends DebugMechanism {
@@ -26,5 +27,23 @@ public class EXTMechanism extends DebugMechanism {
             case GPU_BUFFER -> EXTDebugLabel.GL_BUFFER_OBJECT_EXT;
             default -> throw new RuntimeException("What.");
         }, id, name);
+    }
+
+    @Override
+    public void debugSection(String name, int color) {
+        if (!marker) return;
+        EXTDebugMarker.glPushGroupMarkerEXT(name);
+    }
+
+    @Override
+    public void exitSection() {
+        if (!marker) return;
+        EXTDebugMarker.glPopGroupMarkerEXT();
+    }
+
+    @Override
+    public void debugEvent(String name, int color) {
+        if (!marker) return;
+        EXTDebugMarker.glInsertEventMarkerEXT(name);
     }
 }

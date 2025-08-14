@@ -11,7 +11,9 @@ import tfc.renirol.api.obj.GPUBuffer;
 import tfc.renirol.api.obj.Sampler;
 import tfc.renirol.api.shader.ShaderObject;
 import tfc.renirol.api.shader.ShaderProgram;
+import tfc.renirol.api.textures.Texture1D;
 import tfc.renirol.api.textures.Texture2D;
+import tfc.renirol.api.textures.Texture3D;
 import tfc.renirol.api.textures.TextureBuilder;
 
 import java.util.ArrayList;
@@ -31,7 +33,11 @@ public abstract class GraphicsSystem implements GraphicsCalls {
 
     public abstract TextureBuilder textureBuilder();
 
+    public abstract Texture1D tex1d(TextureFormat format, int length);
+
     public abstract Texture2D tex2d(TextureFormat format, int width, int height);
+
+    public abstract Texture3D tex3d(TextureFormat format, int width, int height, int depth);
 
     public abstract Sampler sampler();
 

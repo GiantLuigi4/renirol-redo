@@ -13,9 +13,7 @@ import tfc.renirol.api.obj.GPUBuffer;
 import tfc.renirol.api.obj.Sampler;
 import tfc.renirol.api.shader.ShaderObject;
 import tfc.renirol.api.shader.ShaderProgram;
-import tfc.renirol.api.textures.BaseTexture;
-import tfc.renirol.api.textures.Texture2D;
-import tfc.renirol.api.textures.TextureBuilder;
+import tfc.renirol.api.textures.*;
 import tfc.renirol.internal.GraphicsSystem;
 import tfc.renirol.ogl.cmd.GLCmdBuffer;
 import tfc.renirol.ogl.debug.*;
@@ -115,6 +113,15 @@ abstract class OGLObjectManager extends GraphicsSystem {
         GL30.glDeleteTextures(vao.id());
     }
 
+    OGLTex1D TEXTURE_1D;
+
+    public void bindTex(OGLTex1D tex1D) {
+        if (tex1D == TEXTURE_1D) return;
+
+        TEXTURE_1D = tex1D;
+        GL30.glBindTexture(GL20.GL_TEXTURE_1D, tex1D.id());
+    }
+
     OGLTex2D TEXTURE_2D;
 
     public void bindTex(OGLTex2D tex2D) {
@@ -124,9 +131,28 @@ abstract class OGLObjectManager extends GraphicsSystem {
         GL30.glBindTexture(GL20.GL_TEXTURE_2D, tex2D.id());
     }
 
+    OGLTex3D TEXTURE_3D;
+
+    public void bindTex(OGLTex3D tex3D) {
+        if (tex3D == TEXTURE_3D) return;
+
+        TEXTURE_3D = tex3D;
+        GL30.glBindTexture(GL20.GL_TEXTURE_3D, tex3D.id());
+    }
+
     public void unbindTex() {
-        TEXTURE_2D = null;
-        GL30.glBindTexture(GL20.GL_TEXTURE_2D, 0);
+        if (TEXTURE_1D != null) {
+            TEXTURE_1D = null;
+            GL30.glBindTexture(GL20.GL_TEXTURE_1D, 0);
+        }
+        if (TEXTURE_2D != null) {
+            TEXTURE_2D = null;
+            GL30.glBindTexture(GL20.GL_TEXTURE_2D, 0);
+        }
+        if (TEXTURE_3D != null) {
+            TEXTURE_3D = null;
+            GL30.glBindTexture(GL20.GL_TEXTURE_3D, 0);
+        }
     }
 
     BaseTexture BOUND;
@@ -139,13 +165,15 @@ abstract class OGLObjectManager extends GraphicsSystem {
         if (BOUND != null) {
             TexID id = (TexID) BOUND;
             GL33.glBindTexture(id.target(), id.id());
+            TEXTURE_1D = null;
             TEXTURE_2D = null;
+            TEXTURE_3D = null;
         }
     }
 
-    public void delTex(OGLTex2D tex) {
+    public void delTex(BaseTexture tex) {
         if (tex == TEXTURE_2D) TEXTURE_2D = null;
-        GL30.glDeleteTextures(tex.id());
+        GL30.glDeleteTextures(((TexID) tex).id());
     }
 
     OGLFBO GENERAL_FBO;
@@ -173,8 +201,18 @@ abstract class OGLObjectManager extends GraphicsSystem {
     }
 
     @Override
+    public Texture1D tex1d(TextureFormat format, int length) {
+        return bindObject(new OGLTex1D((OGLGraphicsSystem) this, format, length));
+    }
+
+    @Override
     public Texture2D tex2d(TextureFormat format, int width, int height) {
         return bindObject(new OGLTex2D((OGLGraphicsSystem) this, format, width, height));
+    }
+
+    @Override
+    public Texture3D tex3d(TextureFormat format, int width, int height, int depth) {
+        return bindObject(new OGLTex3D((OGLGraphicsSystem) this, format, width, height, depth));
     }
 
     @Override
@@ -197,10 +235,6 @@ abstract class OGLObjectManager extends GraphicsSystem {
         return bindObject(new OGLShaderProgram((OGLGraphicsSystem) this));
     }
 
-    public void setDebugName(ObjectType type, int id, String name) {
-        debug.setDebugName(type, id, name);
-    }
-
     @Override
     public CommandBuffer commandBuffer() {
         if (supportsDisplayLists) {
@@ -213,5 +247,24 @@ abstract class OGLObjectManager extends GraphicsSystem {
 
     public OGLArrayObject getArrayObject() {
         return ARRAY_OBJECT;
+    }
+
+    public void setDebugName(ObjectType type, int id, String name) {
+        debug.setDebugName(type, id, name);
+    }
+
+    @Override
+    public void debugEvent(String testEvent, int color) {
+        debug.debugEvent(testEvent, color);
+    }
+
+    @Override
+    public void debugGroup(String testEvent, int color) {
+        debug.debugSection(testEvent, color);
+    }
+
+    @Override
+    public void exitGroup() {
+        debug.exitSection();
     }
 }

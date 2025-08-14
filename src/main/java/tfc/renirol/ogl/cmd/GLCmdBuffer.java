@@ -137,6 +137,22 @@ public class GLCmdBuffer extends CommandBuffer {
     }
 
     @Override
+    public void debugEvent(String testEvent, int color) {
+        validateUncompiled();
+        commands.add(new CallArgs.Obj1(DrawCommands.DEBUG_EVT, testEvent));
+    }
+
+    @Override
+    public void debugGroup(String testEvent, int color) {
+
+    }
+
+    @Override
+    public void exitGroup() {
+
+    }
+
+    @Override
     public void compile() {
         // TODO: internal optimizations?
         //       i.e. multiple drawArrays/drawElements->multiDrawIndirect

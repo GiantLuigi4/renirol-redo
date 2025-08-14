@@ -8,17 +8,16 @@ import tfc.renirol.api.enums.*;
 import tfc.renirol.api.framebuffer.FrameBuffer;
 import tfc.renirol.api.obj.ArrayObject;
 import tfc.renirol.api.obj.GPUBuffer;
-import tfc.renirol.api.obj.Sampler;
 import tfc.renirol.api.obj.VertexAttribute;
 import tfc.renirol.api.shader.ShaderObject;
 import tfc.renirol.api.shader.ShaderProgram;
 import tfc.renirol.api.shader.UniformAccessor;
-import tfc.renirol.api.textures.Texture2D;
 
 import java.nio.ByteBuffer;
 
-public class Texture {
+public class Debug {
     public static void main(String[] args) {
+        System.out.println(ProcessHandle.current().pid());
         Configuration.DEBUG.set(true);
         Configuration.DEBUG_LOADER.set(true);
 
@@ -106,21 +105,29 @@ public class Texture {
                 .withSource("""
                         #version 330 core
                         layout (location = 0) in vec3 pos;
-                        out vec2 texC;
+                        out vec3 color;
                         void main() {
                             gl_Position = vec4(pos, 1.0);
-                            texC = vec2((pos.xy + 1) / 2);
+                            color = (pos + 1) / 2;
+                            color.b = 1 - max(color.r, color.g);
                         }
                         """)
                 .compile().setName("Vertex Shader");
         ShaderObject fsh = context.graphicsSystem.shader(ShaderType.FRAGMENT)
                 .withSource("""
                         #version 330 core
-                        in vec2 texC;
+                        #extension GL_ARB_gpu_shader_int64 : require
+                        #extension GL_AMD_gpu_shader_int64 : enable
+                        #extension GL_ARB_shader_clock : require
+                        in vec3 color;
                         out vec4 fc;
-                        uniform sampler2D tex;
+                        uniform vec4 mult;
                         void main() {
-                            fc = texture2D(tex, texC);
+                            uint64_t t = clockARB();
+                            fc = vec4(round(color), 1.0);
+                            uint64_t at = clockARB();
+                            float tm = (float(at - t) - 51) / 10.0;
+                            fc = vec4(tm, tm, tm, 1.0) * mult;
                         }
                         """)
                 .compile().setName("Fragment Shader");
@@ -130,38 +137,12 @@ public class Texture {
                 .link().setName("Shader Program");
 
         UniformAccessor accessor = program
-                .rootBlock().byName("tex")
-                .specifySampler();
-
-        Texture2D tex = context.graphicsSystem.tex2d(TextureFormat.RGBA8, 2, 2);
-        ByteBuffer data = MemoryUtil.memAlloc(4 * 4);
-        data.put((byte) -1);
-        data.put((byte) 0);
-        data.put((byte) -1);
-        data.put((byte) -1);
-        data.put((byte) 0);
-        data.put((byte) 0);
-        data.put((byte) 0);
-        data.put((byte) -1);
-        data.put((byte) 0);
-        data.put((byte) 0);
-        data.put((byte) 0);
-        data.put((byte) -1);
-        data.put((byte) -1);
-        data.put((byte) 0);
-        data.put((byte) -1);
-        data.put((byte) -1);
-        data.position(0);
-        tex.setContent(data, CPUFormat.RGBA);
-
-        Sampler sampler = context.graphicsSystem.sampler();
-        sampler
-                .repeatX(RepeatMode.REPEAT).repeatY(RepeatMode.REPEAT)
-                .interpolate(InterpolationMode.NEAREST).mipmaps(InterpolationMode.NONE)
-                .applyFilters();
+                .rootBlock().byName("mult")
+                .specifyPrimitive(NumericPrimitive.FLOAT, 4);
 
         context.graphicsSystem.useShader(program);
-        accessor.setSampler(sampler.forTexture(tex)).upload();
+        accessor.setFloats(1, 1, 0.5f, 1)
+                .upload();
         context.graphicsSystem.clearShader();
 
         while (!mainWindow.shouldClose()) {
@@ -180,7 +161,10 @@ public class Texture {
 
             ao.activate();
             context.graphicsSystem.useShader(program);
+            context.graphicsSystem.debugGroup("Test Group", 0);
+            context.graphicsSystem.debugEvent("Test Event", 0);
             context.graphicsSystem.drawArrays(6);
+            context.graphicsSystem.exitGroup();
             context.graphicsSystem.clearShader();
             ao.deactivate();
 
@@ -190,8 +174,6 @@ public class Texture {
             mainWindow.present();
         }
 
-        sampler.delete();
-        tex.delete();
         fbo.delete();
         vsh.delete();
         fsh.delete();

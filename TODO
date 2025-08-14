@@ -4,11 +4,9 @@ need:
 - compute shaders
 
 optional:
-- 1d textures
-- 3d textures
 - render buffers
-- debug markers
 - mesh shaders
+- renirol debug messages via khr/ext debug?
 
 C++:
 - optimize command buffer impl?

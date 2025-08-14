@@ -43,4 +43,10 @@ public interface GraphicsCalls {
     void useShader(ShaderProgram program);
 
     void clearShader();
+
+    void debugEvent(String testEvent, int color);
+
+    void debugGroup(String testEvent, int color);
+
+    void exitGroup();
 }

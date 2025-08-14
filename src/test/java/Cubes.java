@@ -1,5 +1,6 @@
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryUtil;
@@ -37,15 +38,10 @@ public class Cubes {
         context.graphicsSystem.start();
 
 
-//        System.out.println(GL30.glGetString(GL30.GL_VENDOR));
-//        System.out.println(GL30.glGetString(GL30.GL_RENDER));
-//        System.out.println(GL30.glGetString(GL30.GL_VERSION));
-//        System.out.println(GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION));
-//
-//        int numExt = GL30.glGetInteger(GL30.GL_NUM_EXTENSIONS);
-//        for (int i = 0; i < numExt; i++) {
-//            System.out.println(GL30.glGetStringi(GL30.GL_EXTENSIONS, i));
-//        }
+        System.out.println(GL30.glGetString(GL30.GL_VENDOR));
+        System.out.println(GL30.glGetString(GL30.GL_RENDER));
+        System.out.println(GL30.glGetString(GL30.GL_VERSION));
+        System.out.println(GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION));
 
 
         GLUtil.setupDebugMessageCallback(System.err);

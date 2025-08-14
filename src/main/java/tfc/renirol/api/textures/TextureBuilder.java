@@ -1,6 +1,5 @@
 package tfc.renirol.api.textures;
 
-import tfc.renirol.api.ReniContext;
 import tfc.renirol.api.enums.TextureFormat;
 import tfc.renirol.internal.GraphicsSystem;
 
@@ -33,7 +32,15 @@ public class TextureBuilder {
         return this;
     }
 
+    public Texture1D create1D() {
+        return system.tex1d(format, width);
+    }
+
     public Texture2D create2D() {
         return system.tex2d(format, width, height);
+    }
+
+    public Texture3D create3D() {
+        return system.tex3d(format, width, height, depth);
     }
 }
