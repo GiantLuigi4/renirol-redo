@@ -268,4 +268,8 @@ public class OGLUniformAccessor extends UniformAccessor {
     public void upload() {
         if (dirty) upload.run();
     }
+
+    public ByteBuffer getRaw() {
+        return data;
+    }
 }

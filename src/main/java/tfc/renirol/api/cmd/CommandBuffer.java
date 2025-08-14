@@ -3,14 +3,31 @@ package tfc.renirol.api.cmd;
 import tfc.renirol.api.GraphicsCalls;
 import tfc.renirol.api.Resource;
 import tfc.renirol.api.obj.ArrayObject;
+import tfc.renirol.api.obj.GPUBuffer;
+import tfc.renirol.api.shader.UniformAccessor;
 
-/**
- * In a command buffer, a draw mode MUST be set before any render calls
- */
+import java.nio.ByteBuffer;
+
 public abstract class CommandBuffer extends Resource<CommandBuffer> implements GraphicsCalls {
     public abstract void bindVAO(ArrayObject obj);
 
     public abstract void unbindVAO();
+
+    /**
+     * Copies the data from a uniform accessor for sake of allowing it to be set later
+     * This can either copy to a CPU buffer or a GPU buffer, dependent on backend+configuration
+     * It should however, default to using a CPU buffer
+     *
+     * @param accessor the uniform accessor to store the data from
+     */
+    // TODO: fill uniform range?
+    //       set individual value?
+    //       set range from buffer?
+    public abstract void setUniform(UniformAccessor accessor);
+
+    public abstract void setBufferData(GPUBuffer buffer, ByteBuffer data);
+
+    public abstract void setBufferSubData(GPUBuffer buffer, ByteBuffer data, int start);
 
     /**
      * Compiles the command buffer when done building

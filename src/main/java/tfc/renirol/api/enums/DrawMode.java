@@ -7,4 +7,11 @@ public enum DrawMode {
     TRIANGLES,
     TRIANGLE_STRIP,
     TRIANGLE_FAN,
+    ;
+
+    private static final DrawMode[] VALUES = values();
+
+    public static DrawMode fromOrdinal(int arg0) {
+        return VALUES[arg0];
+    }
 }

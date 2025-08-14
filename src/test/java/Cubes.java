@@ -139,7 +139,7 @@ public class Cubes {
 
         ArrayObject ao = context.graphicsSystem.createArrayObject().setName("Mesh");
         GPUBuffer buffer = context.graphicsSystem.createBuffer().setName("Mesh Data");
-        buffer.initialize(dBuffer, BufferUsage.GL_STATIC_DRAW);
+        buffer.initialize(dBuffer, BufferUsage.GL_DYNAMIC_DRAW);
         GPUBuffer indices = context.graphicsSystem.createBuffer().setName("Mesh Indices");
         indices.initialize(iBuffer, BufferUsage.GL_STATIC_DRAW);
 
@@ -177,8 +177,9 @@ public class Cubes {
                         out vec3 color;
                         uniform mat4 proj;
                         uniform mat4 model;
+                        uniform int id;
                         void main() {
-                            vec3 _pos = pos + vec3((gl_InstanceID - 1) * 4, 0, 0);
+                            vec3 _pos = pos + vec3(id * 4, 0, 0);
                             gl_Position = proj * model * vec4(_pos, 1.0);
                             color = (pos + 1) / 2;
                             color.b = 1 - max(color.r, color.g);
@@ -211,6 +212,9 @@ public class Cubes {
         UniformAccessor accessor = program
                 .rootBlock().byName("mult")
                 .specifyPrimitive(NumericPrimitive.FLOAT, 4);
+        UniformAccessor accessorId = program
+                .rootBlock().byName("id")
+                .specifyPrimitive(NumericPrimitive.INT, 1);
         UniformAccessor matrProjAccess = program
                 .rootBlock().byName("proj")
                 .specifyMatrix(NumericPrimitive.FLOAT, 4, 4, false);
@@ -226,11 +230,35 @@ public class Cubes {
         FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(16);
 
         CommandBuffer drawCube = context.graphicsSystem.commandBuffer().setName("Draw Cube");
+        ByteBuffer subData = MemoryUtil.memAlloc(4 * 3);
         {
-            drawCube.setDrawMode(DrawMode.TRIANGLES);
             drawCube.bindVAO(ao);
-            drawCube.drawElementsInstanced(36, 3, NumericPrimitive.SHORT);
-            drawCube.clearShader();
+
+            accessorId.setInts(-1);
+            drawCube.setUniform(accessorId);
+            accessor.setFloats(1, 0, 0, 1);
+            drawCube.setUniform(accessor);
+            subData.putFloat(0, 0.5f);
+            subData.putFloat(4, -0.5f);
+            subData.putFloat(8, 0.5f);
+            drawCube.setBufferSubData(buffer, subData, 0);
+            drawCube.drawElements(36, NumericPrimitive.SHORT);
+
+            accessorId.setInts(0);
+            drawCube.setUniform(accessorId);
+            accessor.setFloats(0, 1, 0, 1);
+            drawCube.setUniform(accessor);
+            subData.putFloat(0, 1f);
+            subData.putFloat(4, -1f);
+            subData.putFloat(8, 1f);
+            drawCube.setBufferSubData(buffer, subData, 0);
+            drawCube.drawElements(36, NumericPrimitive.SHORT);
+
+            accessorId.setInts(1);
+            drawCube.setUniform(accessorId);
+            accessor.setFloats(0, 0, 1, 1);
+            drawCube.setUniform(accessor);
+            drawCube.drawElements(36, NumericPrimitive.SHORT);
             drawCube.unbindVAO();
         }
         drawCube.compile();
@@ -266,14 +294,9 @@ public class Cubes {
             matrProjAccess.setFloats(matrixBuffer).upload();
             view.get(matrixBuffer);
             matrModelAccess.setFloats(matrixBuffer).upload();
+            accessor.upload();
             drawCube.dispatch();
-
-//            context.graphicsSystem.useShader(program);
-//            context.graphicsSystem.setDrawMode(DrawMode.TRIANGLES);
-//            ao.activate();
-//            context.graphicsSystem.drawElements(36, NumericPrimitive.SHORT);
-//            context.graphicsSystem.drawElementsInstanced(36, 3, NumericPrimitive.SHORT);
-//            ao.deactivate();
+            context.graphicsSystem.clearShader();
 
             fbo.unbindWrite();
 

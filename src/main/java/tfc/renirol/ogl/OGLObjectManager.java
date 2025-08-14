@@ -101,6 +101,8 @@ abstract class OGLObjectManager extends GraphicsSystem {
     }
 
     public void unbindVAO() {
+        if (ARRAY_OBJECT == null) return;
+
         ARRAY_OBJECT = null;
         GL30.glBindVertexArray(0);
     }
@@ -185,5 +187,9 @@ abstract class OGLObjectManager extends GraphicsSystem {
         } else {
             return bindObject(new GLCmdBuffer((OGLGraphicsSystem) this));
         }
+    }
+
+    public OGLArrayObject getArrayObject() {
+        return ARRAY_OBJECT;
     }
 }

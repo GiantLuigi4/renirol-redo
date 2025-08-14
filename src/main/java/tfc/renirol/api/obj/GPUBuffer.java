@@ -11,4 +11,6 @@ public abstract class GPUBuffer extends Resource<GPUBuffer> {
     public abstract void initialize(ByteBuffer data, BufferUsage usage);
 
     public abstract void setData(ByteBuffer buffer);
+
+    public abstract void setSubData(ByteBuffer buffer, int start);
 }

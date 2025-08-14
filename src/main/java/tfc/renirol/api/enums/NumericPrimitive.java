@@ -16,6 +16,12 @@ public enum NumericPrimitive {
         this.bytes = bytes;
     }
 
+    private static final NumericPrimitive[] VALUES = values();
+
+    public static NumericPrimitive fromOrdinal(int arg2) {
+        return VALUES[arg2];
+    }
+
     public int bytes() {
         return bytes;
     }

@@ -1,9 +1,8 @@
 package tfc.renirol.ogl.obj;
 
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.KHRDebug;
-import tfc.renirol.api.obj.GPUBuffer;
 import tfc.renirol.api.enums.BufferUsage;
+import tfc.renirol.api.obj.GPUBuffer;
 import tfc.renirol.ogl.OGLGraphicsSystem;
 import tfc.renirol.ogl.debug.ObjectType;
 
@@ -69,6 +68,12 @@ public class OGLBuffer extends GPUBuffer {
         GL20.glBufferData(
                 GL20.GL_ARRAY_BUFFER, buffer, usage
         );
+    }
+
+    @Override
+    public void setSubData(ByteBuffer data, int start) {
+        system.bindArrayBuffer(this);
+        GL20.glBufferSubData(GL20.GL_ARRAY_BUFFER, start, data);
     }
 
     public int id() {

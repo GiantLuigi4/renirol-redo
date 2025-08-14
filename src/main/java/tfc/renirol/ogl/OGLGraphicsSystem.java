@@ -17,6 +17,11 @@ public class OGLGraphicsSystem extends OGLObjectManager {
         throw new RuntimeException("TODO");
     }
 
+    @Override
+    public void endRenderPass() {
+        throw new RuntimeException("TODO");
+    }
+
     int drawMode;
     ShaderProgram activeProg;
 
@@ -85,6 +90,11 @@ public class OGLGraphicsSystem extends OGLObjectManager {
     @Override
     public void setViewport(int x, int y, int width, int height) {
         GL20.glViewport(x, y, width, height);
+    }
+
+    @Override
+    public void setScissor(int x, int y, int width, int height) {
+        GL20.glScissor(x, y, width, height);
     }
 
     @Override
