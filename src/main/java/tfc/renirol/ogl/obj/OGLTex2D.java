@@ -40,6 +40,8 @@ public class OGLTex2D extends Texture2D implements TexID {
         );
 
         this.graphicsSystem = graphicsSystem;
+
+        graphicsSystem.restoreTex();
     }
 
     @Override
@@ -53,6 +55,7 @@ public class OGLTex2D extends Texture2D implements TexID {
                 OGLEnums.cpuFormat(cpuFormat),OGLEnums.bestPrim(reniFormat),
                 buffer
         );
+        graphicsSystem.restoreTex();
     }
 
     @Override

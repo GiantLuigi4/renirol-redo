@@ -195,6 +195,8 @@ public class Texture {
             mainWindow.present();
         }
 
+        sampler.delete();
+        tex.delete();
         fbo.delete();
         vsh.delete();
         fsh.delete();

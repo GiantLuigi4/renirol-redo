@@ -9,7 +9,7 @@ public class KHRMechanism extends DebugMechanism {
         org.lwjgl.opengl.KHRDebug.glObjectLabel(switch (type) {
             case FRAMEBUFFER -> GL30.GL_FRAMEBUFFER;
             case TEXTURE -> GL30.GL_TEXTURE;
-            case ARRAY_BUFFER -> GL30.GL_ARRAY_BUFFER;
+            case ARRAY_BUFFER -> KHRDebug.GL_BUFFER;
             case SHADER_OBJECT -> KHRDebug.GL_SHADER;
             case SHADER_PROGRAM -> KHRDebug.GL_PROGRAM;
             case GPU_BUFFER -> KHRDebug.GL_BUFFER;

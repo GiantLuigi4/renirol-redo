@@ -3,6 +3,7 @@ package tfc.renirol.ogl;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
 import tfc.renirol.api.cmd.CommandBuffer;
 import tfc.renirol.api.enums.ShaderType;
 import tfc.renirol.api.enums.TextureFormat;
@@ -12,6 +13,7 @@ import tfc.renirol.api.obj.GPUBuffer;
 import tfc.renirol.api.obj.Sampler;
 import tfc.renirol.api.shader.ShaderObject;
 import tfc.renirol.api.shader.ShaderProgram;
+import tfc.renirol.api.textures.BaseTexture;
 import tfc.renirol.api.textures.Texture2D;
 import tfc.renirol.api.textures.TextureBuilder;
 import tfc.renirol.internal.GraphicsSystem;
@@ -125,6 +127,20 @@ abstract class OGLObjectManager extends GraphicsSystem {
     public void unbindTex() {
         TEXTURE_2D = null;
         GL30.glBindTexture(GL20.GL_TEXTURE_2D, 0);
+    }
+
+    BaseTexture BOUND;
+
+    public void markActiveTex(BaseTexture texture) {
+        BOUND = texture;
+    }
+
+    public void restoreTex() {
+        if (BOUND != null) {
+            TexID id = (TexID) BOUND;
+            GL33.glBindTexture(id.target(), id.id());
+            TEXTURE_2D = null;
+        }
     }
 
     public void delTex(OGLTex2D tex) {

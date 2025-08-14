@@ -7,6 +7,7 @@ import org.lwjgl.system.MemoryUtil;
 import tfc.renirol.api.enums.NumericPrimitive;
 import tfc.renirol.api.obj.TextureSampler;
 import tfc.renirol.api.shader.UniformAccessor;
+import tfc.renirol.api.textures.BaseTexture;
 import tfc.renirol.ogl.OGLGraphicsSystem;
 import tfc.renirol.ogl.obj.OGLSampler;
 import tfc.renirol.ogl.obj.OGLShaderProgram;
@@ -59,6 +60,8 @@ public class OGLUniformAccessor extends UniformAccessor {
             upload = () -> {
                 if (sampler == null) return;
 
+                if (texSlot == 0)
+                    system.markActiveTex(((BaseTexture) sampler.texture));
                 GL33.glActiveTexture(texSlot + GL33.GL_TEXTURE0);
                 GL33.glBindTexture(((TexID) sampler.texture).target(), ((TexID) sampler.texture).id());
                 GL33.glBindSampler(texSlot, ((OGLSampler) sampler.sampler).id());
