@@ -8,6 +8,7 @@ import tfc.renirol.api.enums.TextureFormat;
 import tfc.renirol.api.framebuffer.FrameBuffer;
 import tfc.renirol.api.obj.ArrayObject;
 import tfc.renirol.api.obj.GPUBuffer;
+import tfc.renirol.api.obj.Sampler;
 import tfc.renirol.api.shader.ShaderObject;
 import tfc.renirol.api.shader.ShaderProgram;
 import tfc.renirol.api.textures.Texture2D;
@@ -32,13 +33,15 @@ public abstract class GraphicsSystem implements GraphicsCalls {
 
     public abstract Texture2D tex2d(TextureFormat format, int width, int height);
 
+    public abstract Sampler sampler();
+
     public abstract FrameBuffer framebuffer();
 
     public abstract ShaderObject shader(ShaderType type);
 
     public abstract ShaderProgram shaderProgram();
 
-    public abstract CommandBuffer commandBuffer() ;
+    public abstract CommandBuffer commandBuffer();
 
     /**
      * Unbinds any active framebuffer and prepares the given framebuffer's contents for presentation (display)

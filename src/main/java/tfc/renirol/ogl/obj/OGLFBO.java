@@ -20,7 +20,6 @@ public class OGLFBO extends FrameBuffer {
             system.delFBO(this);
         }
         id = GL30.glGenFramebuffers();
-        debugSetName();
 
         system.bindFBO(this);
         int colorAttachments = 0;
@@ -80,6 +79,8 @@ public class OGLFBO extends FrameBuffer {
             // TODO: better logging
             throw new RuntimeException(new IllegalStateException("Framebuffer incomplete: " + error(status)));
         }
+
+        debugSetName();
     }
 
     public String error(int status) {

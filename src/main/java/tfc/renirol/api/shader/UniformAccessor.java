@@ -1,6 +1,8 @@
 package tfc.renirol.api.shader;
 
 import tfc.renirol.api.enums.NumericPrimitive;
+import tfc.renirol.api.obj.TextureSampler;
+import tfc.renirol.ogl.util.OGLUniformAccessor;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -9,6 +11,8 @@ public abstract class UniformAccessor {
     public abstract UniformAccessor specifyPrimitive(NumericPrimitive type, int count);
 
     public abstract UniformAccessor specifyMatrix(NumericPrimitive type, int width, int height, boolean transposed);
+
+    public abstract UniformAccessor specifySampler();
 
     public abstract void upload();
 
@@ -35,4 +39,6 @@ public abstract class UniformAccessor {
     public abstract UniformAccessor setFloats(float x, float y, float z, float w);
 
     public abstract UniformAccessor setFloats(FloatBuffer data);
+
+    public abstract OGLUniformAccessor setSampler(TextureSampler sampler);
 }

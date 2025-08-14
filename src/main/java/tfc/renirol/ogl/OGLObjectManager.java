@@ -9,6 +9,7 @@ import tfc.renirol.api.enums.TextureFormat;
 import tfc.renirol.api.framebuffer.FrameBuffer;
 import tfc.renirol.api.obj.ArrayObject;
 import tfc.renirol.api.obj.GPUBuffer;
+import tfc.renirol.api.obj.Sampler;
 import tfc.renirol.api.shader.ShaderObject;
 import tfc.renirol.api.shader.ShaderProgram;
 import tfc.renirol.api.textures.Texture2D;
@@ -158,6 +159,11 @@ abstract class OGLObjectManager extends GraphicsSystem {
     @Override
     public Texture2D tex2d(TextureFormat format, int width, int height) {
         return bindObject(new OGLTex2D((OGLGraphicsSystem) this, format, width, height));
+    }
+
+    @Override
+    public Sampler sampler() {
+        return bindObject(new OGLSampler((OGLGraphicsSystem) this));
     }
 
     @Override

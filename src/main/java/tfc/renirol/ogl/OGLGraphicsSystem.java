@@ -1,5 +1,6 @@
 package tfc.renirol.ogl;
 
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
@@ -24,6 +25,14 @@ public class OGLGraphicsSystem extends OGLObjectManager {
 
     int drawMode;
     ShaderProgram activeProg;
+
+    boolean bindless = false;
+
+    @Override
+    public void start() {
+        super.start();
+        bindless = GL.getCapabilities().GL_ARB_bindless_texture;
+    }
 
     @Override
     public void setDrawMode(DrawMode mode) {
@@ -102,11 +111,15 @@ public class OGLGraphicsSystem extends OGLObjectManager {
         if (activeProg != program) {
             GL30.glUseProgram(((OGLShaderProgram) program).id());
             activeProg = program;
+            ((OGLShaderProgram) activeProg).activate();
         }
     }
 
     @Override
     public void clearShader() {
+        if (activeProg != null) {
+            ((OGLShaderProgram) activeProg).deactivate();
+        }
         GL30.glUseProgram(0);
         activeProg = null;
     }
@@ -130,5 +143,9 @@ public class OGLGraphicsSystem extends OGLObjectManager {
         if (activeProg != program) {
             throw new RuntimeException("Incorrect shader bound: " + activeProg + " expected " + program);
         }
+    }
+
+    public boolean supportsBindless() {
+        return bindless;
     }
 }

@@ -1,6 +1,8 @@
 package tfc.renirol.ogl.obj;
 
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL33;
+import tfc.renirol.api.enums.CPUFormat;
 import tfc.renirol.api.enums.TextureFormat;
 import tfc.renirol.api.textures.Texture2D;
 import tfc.renirol.ogl.OGLEnums;
@@ -9,8 +11,10 @@ import tfc.renirol.ogl.debug.ObjectType;
 
 import java.nio.ByteBuffer;
 
-public class OGLTex2D extends Texture2D {
+public class OGLTex2D extends Texture2D implements TexID {
     int id;
+    int myFormat;
+    TextureFormat reniFormat;
     OGLGraphicsSystem graphicsSystem;
 
     public OGLTex2D(
@@ -29,7 +33,7 @@ public class OGLTex2D extends Texture2D {
         GL20.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MAG_FILTER, GL20.GL_LINEAR);
 
         GL20.glTexImage2D(
-                GL20.GL_TEXTURE_2D, 0, OGLEnums.map(format),
+                GL20.GL_TEXTURE_2D, 0, myFormat = OGLEnums.map(reniFormat = format),
                 width, height, 0,
                 OGLEnums.bestCPU(format), OGLEnums.bestPrim(format),
                 (ByteBuffer) null
@@ -39,12 +43,30 @@ public class OGLTex2D extends Texture2D {
     }
 
     @Override
+    public void setContent(ByteBuffer buffer, CPUFormat cpuFormat) {
+        graphicsSystem.bindTex(this);
+        GL33.glBindTexture(GL33.GL_TEXTURE_2D, id);
+        GL33.glTexImage2D(
+                GL33.GL_TEXTURE_2D,
+                0, myFormat,
+                getWidth(), getHeight(), 0,
+                OGLEnums.cpuFormat(cpuFormat),OGLEnums.bestPrim(reniFormat),
+                buffer
+        );
+    }
+
+    @Override
     public void _delete() {
         graphicsSystem.delTex(this);
     }
 
     public int id() {
         return id;
+    }
+
+    @Override
+    public int target() {
+        return GL33.GL_TEXTURE_2D;
     }
 
     @Override

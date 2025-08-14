@@ -1,0 +1,16 @@
+need:
+- multidraw
+- draw indirect
+- compute shaders
+
+optional:
+- 1d textures
+- 3d textures
+- render buffers
+- debug markers
+- mesh shaders
+
+C++:
+- optimize command buffer impl?
+- implement internal optimizations for command buffer compilation
+- implement validation for anything that’s meant to be undefined behavior

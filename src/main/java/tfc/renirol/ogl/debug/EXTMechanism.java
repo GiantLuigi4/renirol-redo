@@ -14,7 +14,7 @@ public class EXTMechanism extends DebugMechanism {
     @Override
     public void setDebugName(ObjectType type, int id, String name) {
         if (!label) return;
-        if (type == ObjectType.GL_DISPLAY_LIST) return;
+        if (type == ObjectType.GL_DISPLAY_LIST || type == ObjectType.SAMPLER) return;
 
 
         EXTDebugLabel.glLabelObjectEXT(switch (type) {

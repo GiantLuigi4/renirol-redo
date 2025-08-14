@@ -1,11 +1,16 @@
 package tfc.renirol.ogl.util;
 
+import org.lwjgl.opengl.ARBBindlessTexture;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryUtil;
 import tfc.renirol.api.enums.NumericPrimitive;
+import tfc.renirol.api.obj.TextureSampler;
 import tfc.renirol.api.shader.UniformAccessor;
 import tfc.renirol.ogl.OGLGraphicsSystem;
+import tfc.renirol.ogl.obj.OGLSampler;
 import tfc.renirol.ogl.obj.OGLShaderProgram;
+import tfc.renirol.ogl.obj.TexID;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -14,12 +19,18 @@ import java.nio.IntBuffer;
 public class OGLUniformAccessor extends UniformAccessor {
     OGLGraphicsSystem system;
     OGLShaderProgram program;
+    TextureSampler sampler = null;
     int location;
+    boolean specified = false;
+    int texSlot;
 
     ByteBuffer data;
     boolean dirty = false;
 
     Runnable upload;
+
+    boolean bound = false;
+    long handle;
 
     public OGLUniformAccessor(OGLGraphicsSystem system, OGLShaderProgram program, int location) {
         this.system = system;
@@ -27,7 +38,40 @@ public class OGLUniformAccessor extends UniformAccessor {
         this.location = location;
     }
 
+    public UniformAccessor specifySampler() {
+        validateUnspecified();
+        specified = true;
+        texSlot = program.markSampler(this);
+        if (system.supportsBindless()) {
+            upload = () -> {
+                if (sampler == null) return;
+
+                long hndl = ARBBindlessTexture.glGetTextureSamplerHandleARB(
+                        ((TexID) sampler.texture).id(),
+                        ((OGLSampler) sampler.sampler).id()
+                );
+                ARBBindlessTexture.glMakeTextureHandleResidentARB(hndl);
+                ARBBindlessTexture.glUniformHandleui64ARB(location, hndl);
+                handle = hndl;
+                bound = true;
+            };
+        } else {
+            upload = () -> {
+                if (sampler == null) return;
+
+                GL33.glActiveTexture(texSlot + GL33.GL_TEXTURE0);
+                GL33.glBindTexture(((TexID) sampler.texture).target(), ((TexID) sampler.texture).id());
+                GL33.glBindSampler(texSlot, ((OGLSampler) sampler.sampler).id());
+                GL33.glUniform1i(location, texSlot);
+                GL33.glActiveTexture(GL33.GL_TEXTURE0);
+            };
+        }
+        return this;
+    }
+
     public UniformAccessor specifyPrimitive(NumericPrimitive type, int count) {
+        validateUnspecified();
+        specified = true;
         data = MemoryUtil.memAlloc(type.bytes() * count);
 
         switch (type) {
@@ -85,6 +129,8 @@ public class OGLUniformAccessor extends UniformAccessor {
     }
 
     public UniformAccessor specifyMatrix(NumericPrimitive type, int width, int height, boolean transposed) {
+        validateUnspecified();
+        specified = true;
         data = MemoryUtil.memAlloc(type.bytes() * width * height);
 
         switch (type) {
@@ -265,11 +311,33 @@ public class OGLUniformAccessor extends UniformAccessor {
         return this;
     }
 
+    @Override
+    public OGLUniformAccessor setSampler(TextureSampler sampler) {
+        this.sampler = sampler;
+        dirty = true;
+        return this;
+    }
+
     public void upload() {
         if (dirty) upload.run();
     }
 
     public ByteBuffer getRaw() {
         return data;
+    }
+
+    public void validateUnspecified() {
+        if (specified) throw new RuntimeException("Cannot respecify a uniform accessor.");
+    }
+
+    public void forceUpload() {
+        upload.run();
+    }
+
+    public void deactivate() {
+        if (bound) {
+            ARBBindlessTexture.glMakeTextureHandleNonResidentARB(handle);
+            bound = false;
+        }
     }
 }

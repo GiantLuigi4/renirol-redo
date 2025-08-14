@@ -1,8 +1,8 @@
 package tfc.renirol.ogl;
 
 import org.lwjgl.opengl.GL30;
-import tfc.renirol.api.enums.NumericPrimitive;
-import tfc.renirol.api.enums.TextureFormat;
+import org.lwjgl.opengl.GL33;
+import tfc.renirol.api.enums.*;
 
 @SuppressWarnings("DuplicateBranchesInSwitch")
 public class OGLEnums {
@@ -26,6 +26,14 @@ public class OGLEnums {
             case STENCIL4 -> GL30.GL_STENCIL_INDEX4;
             case STENCIL8 -> GL30.GL_STENCIL_INDEX8;
             case STENCIL16 -> GL30.GL_STENCIL_INDEX16;
+        };
+    }
+
+
+    public static int cpuFormat(CPUFormat format) {
+        return switch (format) {
+            case R -> GL33.GL_R;
+            case RGBA -> GL33.GL_RGBA;
         };
     }
 
@@ -87,5 +95,42 @@ public class OGLEnums {
             case FLOAT -> GL30.GL_FLOAT;
             case DOUBLE -> GL30.GL_DOUBLE;
         };
+    }
+
+    public static int repeatMode(RepeatMode mode) {
+        return switch (mode) {
+            case CLAMP -> GL30.GL_CLAMP_TO_EDGE;
+            case REPEAT -> GL30.GL_REPEAT;
+            case REPEAT_MIRRORED -> GL30.GL_MIRRORED_REPEAT;
+        };
+    }
+
+    public static int interpolationMode(InterpolationMode mode) {
+        return switch (mode) {
+            case LINEAR -> GL30.GL_LINEAR;
+            case NEAREST -> GL30.GL_NEAREST;
+            default -> throw new RuntimeException("Not an option.");
+        };
+    }
+
+    public static int interpolationMode(InterpolationMode modeInterp, InterpolationMode modeMip) {
+        switch (modeInterp) {
+            case LINEAR -> {
+                return switch (modeMip) {
+                    case LINEAR -> GL33.GL_LINEAR_MIPMAP_LINEAR;
+                    case NEAREST -> GL33.GL_NEAREST_MIPMAP_LINEAR;
+                    case NONE -> GL33.GL_LINEAR;
+                };
+            }
+            case NEAREST -> {
+                return switch (modeMip) {
+                    case LINEAR -> GL33.GL_LINEAR_MIPMAP_NEAREST;
+                    case NEAREST -> GL33.GL_NEAREST_MIPMAP_NEAREST;
+                    case NONE -> GL33.GL_NEAREST;
+                };
+            }
+            case NONE -> throw new RuntimeException("None is not a valid interpolation mode.");
+            default -> throw new RuntimeException("???");
+        }
     }
 }

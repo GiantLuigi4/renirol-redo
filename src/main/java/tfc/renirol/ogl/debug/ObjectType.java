@@ -7,5 +7,6 @@ public enum ObjectType {
     ARRAY_BUFFER,
     SHADER_PROGRAM,
     SHADER_OBJECT,
-    GL_DISPLAY_LIST
+    GL_DISPLAY_LIST,
+    SAMPLER
 }

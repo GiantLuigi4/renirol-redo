@@ -7,12 +7,17 @@ import tfc.renirol.api.shader.UniformBlock;
 import tfc.renirol.ogl.OGLGraphicsSystem;
 import tfc.renirol.ogl.debug.ObjectType;
 import tfc.renirol.ogl.util.OGLRootBlock;
+import tfc.renirol.ogl.util.OGLUniformAccessor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OGLShaderProgram extends ShaderProgram {
     int id;
 
     OGLGraphicsSystem system;
-    OGLRootBlock rootBlock ;
+    OGLRootBlock rootBlock;
+    List<OGLUniformAccessor> samplerAccessors = new ArrayList<>();
 
     public OGLShaderProgram(OGLGraphicsSystem system) {
         id = GL30.glCreateProgram();
@@ -72,5 +77,22 @@ public class OGLShaderProgram extends ShaderProgram {
     @Override
     public UniformBlock rootBlock() {
         return rootBlock;
+    }
+
+    public void activate() {
+        for (OGLUniformAccessor samplerAccessor : samplerAccessors) {
+            samplerAccessor.forceUpload();
+        }
+    }
+
+    public void deactivate() {
+        for (OGLUniformAccessor samplerAccessor : samplerAccessors) {
+            samplerAccessor.deactivate();
+        }
+    }
+
+    public int markSampler(OGLUniformAccessor oglUniformAccessor) {
+        samplerAccessors.add(oglUniformAccessor);
+        return samplerAccessors.size() - 1;
     }
 }
